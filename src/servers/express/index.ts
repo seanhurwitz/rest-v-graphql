@@ -153,7 +153,7 @@ app.delete(
   "/posts/:id",
   authorizeToken,
   authorizePostFromReqParams,
-  async (req: Request<{ id: string }, any, PostUpdate>, res) => {
+  async (_, res) => {
     try {
       const result = await deletePost(res.locals.postId);
       res.send(result);
