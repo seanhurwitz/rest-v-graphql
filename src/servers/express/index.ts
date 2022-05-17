@@ -1,15 +1,23 @@
 import express, { Request } from "express";
 import {
+  createPost,
+  deletePost,
   deleteUser,
+  getPosts,
   getUser,
   getUsers,
   login,
   signup,
+  updatePost,
   updateUser,
 } from "../../modules";
-import { User, UserUpdate } from "../../types";
+import { Post, PostUpdate, User, UserUpdate } from "../../types";
 import { sendExpressError } from "../../utils/errors";
-import { authorizeToken, authorizeUserFromReqParams } from "./auth";
+import {
+  authorizePostFromReqParams,
+  authorizeToken,
+  authorizeUserFromReqParams,
+} from "./auth";
 
 const app = express();
 app.use(express.json());
@@ -92,6 +100,68 @@ app.get("/login", async (req: Request<any, any, any, Partial<User>>, res) => {
     sendExpressError(res, e);
   }
 });
+
+app.get("/posts", async (_, res) => {
+  try {
+    const posts = await getPosts();
+    res.send(posts);
+  } catch (e: any) {
+    sendExpressError(res, e);
+  }
+});
+
+app.post(
+  "/posts",
+  authorizeToken,
+  async (req: Request<any, any, Post>, res) => {
+    try {
+      const posts = await createPost({
+        ...req.body,
+        userId: res.locals.userId,
+      });
+      res.send(posts);
+    } catch (e: any) {
+      sendExpressError(res, e);
+    }
+  }
+);
+
+app.get("/users/current/posts", authorizeToken, async (_, res) => {
+  try {
+    const posts = await getPosts(res.locals.userId);
+    res.send(posts);
+  } catch (e: any) {
+    sendExpressError(res, e);
+  }
+});
+
+app.put(
+  "/posts/:id",
+  authorizeToken,
+  authorizePostFromReqParams,
+  async (req: Request<{ id: string }, any, PostUpdate>, res) => {
+    try {
+      const post = await updatePost({ ...req.body, id: res.locals.postId });
+      res.send(post);
+    } catch (e: any) {
+      sendExpressError(res, e);
+    }
+  }
+);
+
+app.delete(
+  "/posts/:id",
+  authorizeToken,
+  authorizePostFromReqParams,
+  async (req: Request<{ id: string }, any, PostUpdate>, res) => {
+    try {
+      const result = await deletePost(res.locals.postId);
+      res.send(result);
+    } catch (e: any) {
+      sendExpressError(res, e);
+    }
+  }
+);
 
 app.listen(port, () => {
   console.log(`EXPRESS SERVER RUNNING ON http://127.0.0.1:${port}`);

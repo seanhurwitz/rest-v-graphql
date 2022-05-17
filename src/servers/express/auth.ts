@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import { sendExpressError } from "../../utils/errors";
+import { getPost } from "../../modules";
+import { handleError, sendExpressError } from "../../utils/errors";
 
 const authorizeToken = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,6 +13,22 @@ const authorizeToken = (req: Request, res: Response, next: NextFunction) => {
     }
     const decoded = verify(token, "JWTSECRET!");
     res.locals.userId = decoded;
+    next();
+  } catch (e) {
+    sendExpressError(res, e, 403);
+  }
+};
+
+const authorizePostFromReqParams = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: postId } = req.params;
+    const canEdit = (await getPost(req.params.id)).userId === res.locals.userId;
+    handleError(!canEdit, "You are unauthorized to edit this post.");
+    res.locals.postId = postId;
     next();
   } catch (e) {
     sendExpressError(res, e, 403);
@@ -33,4 +50,8 @@ const authorizeUserFromReqParams = (
   }
 };
 
-export { authorizeToken, authorizeUserFromReqParams };
+export {
+  authorizeToken,
+  authorizeUserFromReqParams,
+  authorizePostFromReqParams,
+};

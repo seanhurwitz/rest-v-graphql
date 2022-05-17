@@ -9,12 +9,22 @@ interface UserUpdate {
   name: string;
 }
 
-interface Post {
-  id: string;
+interface PostCreate {
   userId: string;
   title: string;
   subtitle?: string;
   body?: string;
 }
 
-export { User, UserUpdate, Post };
+interface Post extends PostCreate {
+  id: string;
+}
+
+interface PostUpdate {
+  id: string;
+  title: string;
+  subtitle?: string;
+  body?: string;
+}
+
+export { User, UserUpdate, Post, PostUpdate, PostCreate };

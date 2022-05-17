@@ -1,11 +1,10 @@
 import { getUserData, updateUserData } from "../../../data";
 import { User, UserUpdate } from "../../../types";
-import { handleError } from "../../../utils/errors";
+import getUser from "../getUser";
 
 const updateUser = async (input: UserUpdate): Promise<User> => {
   const users = await getUserData();
-  const doesUserExist = users.find((user) => user.id === input.id);
-  handleError(!doesUserExist, "User does not Exist!");
+  await getUser(input.id);
   const newUsers: User[] = users.map((u) =>
     u.id === input.id
       ? {
@@ -15,7 +14,7 @@ const updateUser = async (input: UserUpdate): Promise<User> => {
       : u
   );
   await updateUserData(newUsers);
-  return { ...doesUserExist!, name: input.name };
+  return getUser(input.id);
 };
 
 export default updateUser;
