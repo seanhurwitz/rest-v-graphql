@@ -27,4 +27,21 @@ interface PostUpdate {
   body?: string;
 }
 
-export { User, UserUpdate, Post, PostUpdate, PostCreate };
+interface GQLUserContext {
+  id: string;
+}
+
+interface GQLContextAuth {
+  id: string;
+  context?: GQLUserContext;
+}
+
+export {
+  User,
+  UserUpdate,
+  Post,
+  PostUpdate,
+  PostCreate,
+  GQLUserContext,
+  GQLContextAuth,
+};
