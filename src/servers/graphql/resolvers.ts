@@ -41,9 +41,7 @@ const resolvers = {
       return deletePost(id);
     },
     deleteUser(_: any, __: any, context?: GQLUserContext) {
-      console.log("context", context);
       authorizeToken(context);
-      console.log("context", context);
       return deleteUser(context!.id);
     },
     async updatePost(

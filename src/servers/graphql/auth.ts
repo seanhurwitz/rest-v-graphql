@@ -10,8 +10,6 @@ const authorizeToken = (context?: GQLUserContext) => {
 
 const authorizeUser = ({ context, id }: GQLContextAuth) => {
   authorizeToken(context);
-  console.log("context!.id,id", context!.id, id);
-  console.log("context!.id == id", context!.id === id);
   handleError(context!.id !== id, ERROR_MESSAGE);
 };
 
